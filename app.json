@@ -21,6 +21,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "This is a react native contact application",
+    "githubUrl": "https://github.com/John-pels/react-native-contact-app"
   }
 }

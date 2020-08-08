@@ -1,6 +1,12 @@
 import React, { Component } from "react";
-import { TextInput, StyleSheet, View, Button } from "react-native";
+import {
+  TextInput,
+  StyleSheet,
+  Button,
+  KeyboardAvoidingView,
+} from "react-native";
 import PropTypes from "prop-types";
+import constants from "expo-constants";
 
 const styles = StyleSheet.create({
   input: {
@@ -13,6 +19,12 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 3,
   },
+  container: {
+    flex: 1,
+    margin: 10,
+    paddingTop: constants.statusBarHeight,
+    justifyContent: "center",
+  },
 });
 
 export default class AddContactForm extends Component {
@@ -23,15 +35,40 @@ export default class AddContactForm extends Component {
   state = {
     name: "",
     phone: "",
+    isFormValid: false,
   };
 
-  handleNameChange = (name) => {
-    this.setState({ name });
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.state.name !== prevState.name ||
+      this.state.phone !== prevState.phone
+    ) {
+      this.validateForm();
+    }
+  }
+
+  getHandler = (key) => (val) => {
+    this.setState({ [key]: val });
   };
 
   handlePhoneChange = (phone) => {
-    if (+phone >= 0) {
+    if (+phone >= 0 && phone.length <= 10) {
       this.setState({ phone });
+    }
+  };
+
+  validateForm = () => {
+    const names = this.state.name.split(" ");
+    if (
+      +this.state.phone >= 0 &&
+      this.state.phone.length === 10 &&
+      names.length >= 2 &&
+      names[0] &&
+      names[1]
+    ) {
+      this.setState({ isFormValid: true });
+    } else {
+      this.setState({ isFormValid: false });
     }
   };
 
@@ -41,24 +78,28 @@ export default class AddContactForm extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <TextInput
           value={this.state.name}
           style={styles.input}
-          onChangeText={this.handleNameChange}
+          onChangeText={this.getHandler("name")}
           placeholder="Name"
         />
 
         <TextInput
           value={this.state.phone}
           style={styles.input}
-          onChangeText={this.handlePhoneChange}
+          onChangeText={this.getHandler("phone")}
           keyboardType="numeric"
           placeholder="Phone"
         />
 
-        <Button title="Submit" onPress={this.handleSubmit} />
-      </View>
+        <Button
+          title="Submit"
+          onPress={this.handleSubmit}
+          disabled={!this.state.isFormValid}
+        />
+      </KeyboardAvoidingView>
     );
   }
 }
