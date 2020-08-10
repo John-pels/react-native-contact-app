@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import constants from "expo-constants";
-import contacts from "./contacts";
 import {
   createStackNavigator,
   createSwitchNavigator,
@@ -13,6 +12,7 @@ import ContactDetailsScreen from "./screens/ContactDetailsScreen";
 import LoginScreen from "./screens/LoginScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { fetchUsers } from "./api";
 
 const ContactsTab = createStackNavigator(
   {
@@ -61,7 +61,16 @@ const AppNavigator = createSwitchNavigator(
 
 export default class App extends React.Component {
   state = {
-    contacts: contacts,
+    contacts: null,
+  };
+
+  componentDidMount() {
+    this.getUsers();
+  }
+
+  getUsers = async () => {
+    const results = await fetchUsers();
+    this.setState({ contacts: results });
   };
 
   addContact = (newContact) => {
